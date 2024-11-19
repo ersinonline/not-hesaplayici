@@ -122,7 +122,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Not Hesaplama</h1>
+        <h1>A2 Not Hesaplama</h1>
         <form id="gradeForm">
             <label for="midLevel">Mid Level Exam Notu (%20):</label>
             <input type="number" id="midLevel" min="0" max="100" required placeholder="0 - 100">
@@ -159,64 +159,96 @@
         </div>
     </div>
 
-    <script>
-        function calculateGrade() {
-            const inputs = [
-                { id: "midLevel", max: 100 },
-                { id: "endLevel", max: 100 },
-                { id: "writing", max: 20 },
-                { id: "participation", max: 10 },
-            ];
+<script>
+    // Form verilerini localStorage'a kaydet
+    function saveFormData() {
+        const formData = {
+            midLevel: document.getElementById("midLevel").value,
+            endLevel: document.getElementById("endLevel").value,
+            wextHomework: document.getElementById("wextHomework").value,
+            macmillanHomework: document.getElementById("macmillanHomework").value,
+            writing: document.getElementById("writing").value,
+            participation: document.getElementById("participation").value,
+        };
+        localStorage.setItem("gradeFormData", JSON.stringify(formData));
+    }
 
-            const errorMessage = document.getElementById("errorMessage");
-            errorMessage.textContent = "";
-
-            let hasError = false;
-
-            inputs.forEach(inputData => {
-                const input = document.getElementById(inputData.id);
-                input.classList.remove("error-input");
-
-                const value = parseFloat(input.value);
-                if (value > inputData.max || value < 0 || isNaN(value)) {
-                    hasError = true;
-                    input.classList.add("error-input");
-                }
-            });
-
-            if (hasError) {
-                errorMessage.textContent = "Lütfen belirtilen değerler arasında giriş yapın!";
-                return;
-            }
-
-            const midLevel = parseFloat(document.getElementById("midLevel").value);
-            const endLevel = parseFloat(document.getElementById("endLevel").value);
-            const wextHomework = parseFloat(document.getElementById("wextHomework").value);
-            const macmillanHomework = parseFloat(document.getElementById("macmillanHomework").value);
-            const writing = parseFloat(document.getElementById("writing").value);
-            const participation = parseFloat(document.getElementById("participation").value);
-
-            // Not hesaplama
-            let totalGrade = 
-                (midLevel * 0.2) +
-                (endLevel * 0.45) +
-                wextHomework +
-                macmillanHomework +
-                (writing * 5 * 0.1) +
-                participation;
-
-            totalGrade = Math.min(totalGrade, 100); // Toplam notu 100 ile sınırlandır
-
-            // Sonuç güncelleme
-            document.getElementById("totalGrade").textContent = totalGrade.toFixed(2);
-
-            const passFailMessage = document.getElementById("passFailMessage");
-            if (totalGrade < 70) {
-                passFailMessage.innerHTML = '<span class="fail">Maalesef, bu kuru geçemediniz.</span>';
-            } else {
-                passFailMessage.innerHTML = '<span class="pass">Tebrikler, bu kuru geçtiniz!</span>';
-            }
+    // Form verilerini localStorage'dan yükle
+    function loadFormData() {
+        const savedData = JSON.parse(localStorage.getItem("gradeFormData"));
+        if (savedData) {
+            document.getElementById("midLevel").value = savedData.midLevel || "";
+            document.getElementById("endLevel").value = savedData.endLevel || "";
+            document.getElementById("wextHomework").value = savedData.wextHomework || "0";
+            document.getElementById("macmillanHomework").value = savedData.macmillanHomework || "0";
+            document.getElementById("writing").value = savedData.writing || "";
+            document.getElementById("participation").value = savedData.participation || "";
         }
-    </script>
+    }
+
+    // Sayfa yüklendiğinde verileri yükle
+    window.onload = loadFormData;
+
+    function calculateGrade() {
+        saveFormData(); // Hesaplama öncesi verileri kaydet
+
+        const inputs = [
+            { id: "midLevel", max: 100 },
+            { id: "endLevel", max: 100 },
+            { id: "writing", max: 20 },
+            { id: "participation", max: 10 },
+        ];
+
+        const errorMessage = document.getElementById("errorMessage");
+        errorMessage.textContent = "";
+
+        let hasError = false;
+
+        inputs.forEach(inputData => {
+            const input = document.getElementById(inputData.id);
+            input.classList.remove("error-input");
+
+            const value = parseFloat(input.value);
+            if (value > inputData.max || value < 0 || isNaN(value)) {
+                hasError = true;
+                input.classList.add("error-input");
+            }
+        });
+
+        if (hasError) {
+            errorMessage.textContent = "Lütfen belirtilen değerler arasında giriş yapın!";
+            return;
+        }
+
+        const midLevel = parseFloat(document.getElementById("midLevel").value);
+        const endLevel = parseFloat(document.getElementById("endLevel").value);
+        const wextHomework = parseFloat(document.getElementById("wextHomework").value);
+        const macmillanHomework = parseFloat(document.getElementById("macmillanHomework").value);
+        const writing = parseFloat(document.getElementById("writing").value);
+        const participation = parseFloat(document.getElementById("participation").value);
+
+        // Not hesaplama
+        let totalGrade = 
+            (midLevel * 0.2) +
+            (endLevel * 0.45) +
+            wextHomework +
+            macmillanHomework +
+            (writing * 5 * 0.1) +
+            participation;
+
+        totalGrade = Math.min(totalGrade, 100); // Toplam notu 100 ile sınırlandır
+
+        // Sonuç güncelleme
+        document.getElementById("totalGrade").textContent = totalGrade.toFixed(2);
+
+        const passFailMessage = document.getElementById("passFailMessage");
+        if (totalGrade < 70) {
+            passFailMessage.innerHTML = '<span class="fail">Maalesef, bu kuru geçemediniz.</span>';
+        } else {
+            passFailMessage.innerHTML = '<span class="pass">Tebrikler, bu kuru geçtiniz!</span>';
+        }
+    }
+</script>
+
 </body>
 </html>
