@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not Hesaplama</title>
+    <style>
+        /* Genel Sayfa Stili */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Ana Konteyner */
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #ffb700;
+            border-bottom: 2px solid #ffb700;
+            padding-bottom: 10px;
+        }
+
+        /* Form Elemanları */
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            border-color: #ffb700;
+            outline: none;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield; /* Sayısal girişte yukarı/aşağı okları kaldırır */
+        }
+
+        /* Hatalı Girdi Kutusu */
+        .error-input {
+            border-color: #e53935 !important;
+        }
+
+        /* Hesapla Butonu */
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background-color: #ffb700;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e6a500;
+        }
+
+        /* Sonuç Bölümü */
+        .result {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .result span {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+
+        .pass {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .fail {
+            background-color: #e53935;
+            color: #fff;
+        }
+
+        .error {
+            color: #e53935;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Not Hesaplama</h1>
+        <form id="gradeForm">
+            <label for="midLevel">Mid Level Exam Notu (%20):</label>
+            <input type="number" id="midLevel" min="0" max="100" required placeholder="0 - 100">
+
+            <label for="endLevel">End Level Exam Notu (%45):</label>
+            <input type="number" id="endLevel" min="0" max="100" required placeholder="0 - 100">
+
+            <label for="wextHomework">WEXT Ödevi Yapıldı mı? (%5):</label>
+            <select id="wextHomework" required>
+                <option value="5">Evet</option>
+                <option value="0">Hayır</option>
+            </select>
+
+            <label for="macmillanHomework">Macmillan Ödevi Yapıldı mı? (%10):</label>
+            <select id="macmillanHomework" required>
+                <option value="10">Evet</option>
+                <option value="0">Hayır</option>
+            </select>
+
+            <label for="writing">Writing Notu (%10):</label>
+            <input type="number" id="writing" min="0" max="20" required placeholder="0 - 20">
+
+            <label for="participation">Katılım Notu (%10):</label>
+            <input type="number" id="participation" min="0" max="10" required placeholder="0 - 10">
+
+            <button type="button" onclick="calculateGrade()">Hesapla</button>
+        </form>
+
+        <div id="errorMessage" class="error"></div>
+
+        <div class="result">
+            <p>Toplam Not: <span id="totalGrade">-</span></p>
+            <p id="passFailMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        function calculateGrade() {
+            const inputs = [
+                { id: "midLevel", max: 100 },
+                { id: "endLevel", max: 100 },
+                { id: "writing", max: 20 },
+                { id: "participation", max: 10 },
+            ];
+
+            const errorMessage = document.getElementById("errorMessage");
+            errorMessage.textContent = "";
+
+            let hasError = false;
+
+            inputs.forEach(inputData => {
+                const input = document.getElementById(inputData.id);
+                input.classList.remove("error-input");
+
+                const value = parseFloat(input.value);
+                if (value > inputData.max || value < 0 || isNaN(value)) {
+                    hasError = true;
+                    input.classList.add("error-input");
+                }
+            });
+
+            if (hasError) {
+                errorMessage.textContent = "Lütfen belirtilen değerler arasında giriş yapın!";
+                return;
+            }
+
+            const midLevel = parseFloat(document.getElementById("midLevel").value);
+            const endLevel = parseFloat(document.getElementById("endLevel").value);
+            const wextHomework = parseFloat(document.getElementById("wextHomework").value);
+            const macmillanHomework = parseFloat(document.getElementById("macmillanHomework").value);
+            const writing = parseFloat(document.getElementById("writing").value);
+            const participation = parseFloat(document.getElementById("participation").value);
+
+            // Not hesaplama
+            let totalGrade = 
+                (midLevel * 0.2) +
+                (endLevel * 0.45) +
+                wextHomework +
+                macmillanHomework +
+                (writing * 5 * 0.1) +
+                participation;
+
+            totalGrade = Math.min(totalGrade, 100); // Toplam notu 100 ile sınırlandır
+
+            // Sonuç güncelleme
+            document.getElementById("totalGrade").textContent = totalGrade.toFixed(2);
+
+            const passFailMessage = document.getElementById("passFailMessage");
+            if (totalGrade < 70) {
+                passFailMessage.innerHTML = '<span class="fail">Maalesef, bu kuru geçemediniz.</span>';
+            } else {
+                passFailMessage.innerHTML = '<span class="pass">Tebrikler, bu kuru geçtiniz!</span>';
+            }
+        }
+    </script>
+</body>
+</html>
